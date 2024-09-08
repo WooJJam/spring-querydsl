@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static woojjam.querydsl.QMember.*;
+
 @SpringBootTest
 @Transactional
 public class QuerydslBasicTest {
@@ -51,7 +53,7 @@ public class QuerydslBasicTest {
 
     @Test
     public void startQueryDsl() throws Exception {
-        QMember m = QMember.member;
+        QMember m = member;
 
         Member member = queryFactory
                 .select(m)
@@ -61,6 +63,31 @@ public class QuerydslBasicTest {
 
         Assertions.assertThat(member.getUsername()).isEqualTo("member1");
 
+    }
+
+    @Test
+    public void search() throws Exception {
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .where(member.username.eq("member1")
+                        .and(member.age.eq(10)))
+                .fetchOne();
+
+        Assertions.assertThat(findMember.getUsername()).isEqualTo("member1");
+
+    }
+
+    @Test
+    public void searchAndParam() throws Exception {
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .where(
+                        member.username.eq("member1"),
+                        member.age.eq(10)
+                )
+                .fetchOne();
+
+        Assertions.assertThat(findMember.getUsername()).isEqualTo("member1");
 
     }
 
