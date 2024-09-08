@@ -1,5 +1,6 @@
 package woojjam.querydsl;
 
+import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -32,15 +33,15 @@ public class QuerydslBasicTest {
         em.persist(teamB);
 
         Member member1 = new Member("member1", 10, teamA);
-//        Member member2 = new Member("member2", 20, teamA);
+        Member member2 = new Member("member2", 20, teamA);
 //
-//        Member member3 = new Member("member3", 30, teamB);
-//        Member member4 = new Member("member4", 40, teamB);
+        Member member3 = new Member("member3", 30, teamB);
+        Member member4 = new Member("member4", 40, teamB);
 
         em.persist(member1);
-//        em.persist(member2);
-//        em.persist(member3);
-//        em.persist(member4);
+        em.persist(member2);
+        em.persist(member3);
+        em.persist(member4);
     }
 
     @Test
@@ -102,6 +103,7 @@ public class QuerydslBasicTest {
 
         Member fetchOne = queryFactory
                 .selectFrom(member)
+                .where(member.username.eq("member1"))
                 .fetchOne();
 
         Member fetchFirst = queryFactory
@@ -145,6 +147,35 @@ public class QuerydslBasicTest {
         Assertions.assertThat(member5.getUsername()).isEqualTo("member5");
         Assertions.assertThat(member6.getUsername()).isEqualTo("member6");
         Assertions.assertThat(memberNull.getUsername()).isNull();
+
+    }
+
+    @Test
+    public void paging1() throws Exception {
+        List<Member> result = queryFactory
+                .selectFrom(member)
+                .orderBy(member.username.desc())
+                .offset(1)
+                .limit(2)
+                .fetch();
+
+        Assertions.assertThat(result.size()).isEqualTo(2);
+
+    }
+    
+    @Test
+    public void paging2() throws Exception {
+
+        QueryResults<Member> queryResults = queryFactory.selectFrom(member)
+                .orderBy(member.username.desc())
+                .offset(1)
+                .limit(2)
+                .fetchResults();
+
+        Assertions.assertThat(queryResults.getTotal()).isEqualTo(4);
+        Assertions.assertThat(queryResults.getLimit()).isEqualTo(2);
+        Assertions.assertThat(queryResults.getOffset()).isEqualTo(1);
+        Assertions.assertThat(queryResults.getResults()).size().isEqualTo(2);
 
     }
 
