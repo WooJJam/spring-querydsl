@@ -1,17 +1,13 @@
-package woojjam.querydsl;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.stereotype.Component;
-import org.springframework.test.annotation.Commit;
-import org.springframework.transaction.annotation.Transactional;
+package woojjam.querydsl.entity;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
+import org.springframework.transaction.annotation.Transactional;
+import woojjam.querydsl.Member;
+import woojjam.querydsl.Team;
 
 @SpringBootTest
 @Transactional
@@ -38,18 +34,5 @@ class MemberTest {
 		em.persist(member2);
 		em.persist(member3);
 		em.persist(member4);
-
-		// 초기화
-		em.flush();
-		em.clear();
-
-		List<Member> members = em.createQuery("select m from Member m", Member.class)
-			.getResultList();
-
-		for (Member member : members) {
-			System.out.println("member = " + member);
-			System.out.println("-> member.getTeam() = " + member.getTeam());
-		}
 	}
-
 }
