@@ -20,6 +20,7 @@ public class QuerydslBasicTest {
 
     @BeforeEach
     public void init () {
+        queryFactory = new JPAQueryFactory(em);
         Team teamA = new Team("teamA");
         Team teamB = new Team("teamB");
         em.persist(teamA);
@@ -50,8 +51,7 @@ public class QuerydslBasicTest {
 
     @Test
     public void startQueryDsl() throws Exception {
-        queryFactory = new JPAQueryFactory(em);
-        QMember m = new QMember("m");
+        QMember m = QMember.member;
 
         Member member = queryFactory
                 .select(m)
