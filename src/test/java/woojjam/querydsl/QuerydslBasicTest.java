@@ -1,11 +1,11 @@
 package woojjam.querydsl;
 
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static woojjam.querydsl.QMember.member;
+import static woojjam.querydsl.QTeam.*;
 
 @SpringBootTest
 @Transactional
@@ -51,7 +53,7 @@ public class QuerydslBasicTest {
                 .setParameter("username", "member1")
                 .getSingleResult();
 
-        Assertions.assertThat(findByJQPL.getUsername()).isEqualTo("member1");
+        assertThat(findByJQPL.getUsername()).isEqualTo("member1");
 
     }
 
@@ -65,7 +67,7 @@ public class QuerydslBasicTest {
                 .where(m.username.eq("member1"))
                 .fetchOne();
 
-        Assertions.assertThat(member.getUsername()).isEqualTo("member1");
+        assertThat(member.getUsername()).isEqualTo("member1");
 
     }
 
@@ -77,7 +79,7 @@ public class QuerydslBasicTest {
                         .and(member.age.eq(10)))
                 .fetchOne();
 
-        Assertions.assertThat(findMember.getUsername()).isEqualTo("member1");
+        assertThat(findMember.getUsername()).isEqualTo("member1");
 
     }
 
@@ -91,7 +93,7 @@ public class QuerydslBasicTest {
                 )
                 .fetchOne();
 
-        Assertions.assertThat(findMember.getUsername()).isEqualTo("member1");
+        assertThat(findMember.getUsername()).isEqualTo("member1");
 
     }
 
@@ -144,9 +146,9 @@ public class QuerydslBasicTest {
         Member member6 = result.get(1);
         Member memberNull = result.get(2);
 
-        Assertions.assertThat(member5.getUsername()).isEqualTo("member5");
-        Assertions.assertThat(member6.getUsername()).isEqualTo("member6");
-        Assertions.assertThat(memberNull.getUsername()).isNull();
+        assertThat(member5.getUsername()).isEqualTo("member5");
+        assertThat(member6.getUsername()).isEqualTo("member6");
+        assertThat(memberNull.getUsername()).isNull();
 
     }
 
@@ -159,10 +161,10 @@ public class QuerydslBasicTest {
                 .limit(2)
                 .fetch();
 
-        Assertions.assertThat(result.size()).isEqualTo(2);
+        assertThat(result.size()).isEqualTo(2);
 
     }
-    
+
     @Test
     public void paging2() throws Exception {
 
@@ -172,10 +174,55 @@ public class QuerydslBasicTest {
                 .limit(2)
                 .fetchResults();
 
-        Assertions.assertThat(queryResults.getTotal()).isEqualTo(4);
-        Assertions.assertThat(queryResults.getLimit()).isEqualTo(2);
-        Assertions.assertThat(queryResults.getOffset()).isEqualTo(1);
-        Assertions.assertThat(queryResults.getResults()).size().isEqualTo(2);
+        assertThat(queryResults.getTotal()).isEqualTo(4);
+        assertThat(queryResults.getLimit()).isEqualTo(2);
+        assertThat(queryResults.getOffset()).isEqualTo(1);
+        assertThat(queryResults.getResults()).size().isEqualTo(2);
+
+    }
+
+    @Test
+    public void aggreagtion() throws Exception {
+
+        List<Tuple> result = queryFactory
+                .select(
+                        member.count(),
+                        member.age.sum(),
+                        member.age.avg(),
+                        member.age.max(),
+                        member.age.min()
+                ).from(member)
+                .fetch();
+
+        Tuple tuple = result.get(0);
+        assertThat(tuple.get(member.count())).isEqualTo(4);
+        assertThat(tuple.get(member.age.sum())).isEqualTo(100);
+        assertThat(tuple.get(member.age.avg())).isEqualTo(25);
+        assertThat(tuple.get(member.age.max())).isEqualTo(40);
+        assertThat(tuple.get(member.age.min())).isEqualTo(10);
+
+    }
+
+    /**
+     * 팀의 이름과 각 팀의 평균 연령을 구해라
+     */
+    @Test
+    public void group() throws Exception {
+
+        List<Tuple> result = queryFactory.select(team.name, member.age.avg())
+                .from(member)
+                .join(member.team, team)
+                .groupBy(team.name)
+                .fetch();
+
+        Tuple teamA = result.get(0);
+        Tuple teamB = result.get(1);
+
+        assertThat(teamA.get(team.name)).isEqualTo("teamA");
+        assertThat(teamA.get(member.age.avg())).isEqualTo(15);
+
+        assertThat(teamB.get(team.name)).isEqualTo("teamB");
+        assertThat(teamB.get(member.age.avg())).isEqualTo(35);
 
     }
 
