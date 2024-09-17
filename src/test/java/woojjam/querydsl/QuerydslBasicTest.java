@@ -26,6 +26,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceUnit;
 import jakarta.transaction.Transactional;
 import woojjam.querydsl.dto.MemberDto;
+import woojjam.querydsl.dto.QMemberDto;
 import woojjam.querydsl.dto.UserDto;
 
 @SpringBootTest
@@ -591,6 +592,17 @@ public class QuerydslBasicTest {
 				MemberDto.class,
 				member.username,
 				member.age))
+			.from(member)
+			.fetch();
+
+		for (MemberDto memberDto : result) {
+			System.out.println("memberDto = " + memberDto);
+		}
+	}
+	
+	@Test
+	public void findDtoByQueryProjection() throws Exception{
+		List<MemberDto> result = queryFactory.select(new QMemberDto(member.username, member.age))
 			.from(member)
 			.fetch();
 
