@@ -15,7 +15,9 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.Wildcard;
@@ -621,6 +623,19 @@ public class QuerydslBasicTest {
 		assertThat(result.size()).isEqualTo(1);
 	}
 
+	/**
+	 * Where 다중 파라미터  사용
+	 * 실무에서 가장 많이 사용하는 방식
+	 */
+	@Test
+	public void dynamicQuery_WhereParam() throws Exception{
+		String usernameParam = "member1";
+		Integer ageParam = null;
+
+		List<Member> result = searchMember2(usernameParam, ageParam);
+		assertThat(result.size()).isEqualTo(1);
+	}
+
 	private List<Member> searchMember1(String usernameCond, Integer ageCond) {
 
 		BooleanBuilder builder = new BooleanBuilder();
@@ -637,6 +652,36 @@ public class QuerydslBasicTest {
 			.selectFrom(member)
 			.where(builder)
 			.fetch();
+	}
+
+	private List<Member> searchMember2(String usernameCond, Integer ageCond) {
+		// return queryFactory
+		// 	.selectFrom(member)
+		// 	.where(usernameEq(usernameCond), ageEq(ageCond))
+		// 	.fetch();
+
+		return queryFactory
+			.selectFrom(member)
+			.where(allEq(usernameCond, ageCond))
+			.fetch();
+	}
+
+	private BooleanExpression usernameEq(String usernameCond) {
+		// if (usernameCond == null) {
+		// 	return null;
+		// }
+		//
+		// return member.username.eq(usernameCond);
+
+		return usernameCond != null ? member.username.eq(usernameCond) : null;
+	}
+
+	private BooleanExpression ageEq(Integer ageCond) {
+		return ageCond != null ? member.age.eq(member.age) : null;
+	}
+
+	private Predicate allEq(String usernameCond, Integer ageCond) {
+		return usernameEq(usernameCond).and(ageEq(ageCond));
 	}
 
 }
