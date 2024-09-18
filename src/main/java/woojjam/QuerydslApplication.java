@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class QuerydslApplication {
 
 	public static void main(String[] args) {
-		System.out.println("args = " + args);
 		SpringApplication.run(QuerydslApplication.class, args);
 	}
 

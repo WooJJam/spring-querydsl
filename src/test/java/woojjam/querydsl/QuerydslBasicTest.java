@@ -684,5 +684,42 @@ public class QuerydslBasicTest {
 		return usernameEq(usernameCond).and(ageEq(ageCond));
 	}
 
+	@Test
+	public void bulkUpdate() throws Exception{
+
+		long count = queryFactory
+			.update(member)
+			.set(member.username, "비회원")
+			.where(member.age.lt(28))
+			.execute();
+
+		em.flush();
+		em.clear();
+
+		assertThat(count).isEqualTo(2);
+
+		List<Member> result = queryFactory.selectFrom(member)
+			.fetch();
+
+		for (Member member : result) {
+			System.out.println("member = " + member);
+		}
+	}
+
+	@Test
+	public void bulkAdd() throws Exception{
+		long count = queryFactory
+			.update(member)
+			.set(member.age, member.age.add(-1))
+			.execute();
+	}
+
+	@Test
+	public void bulkDelete() throws Exception{
+		long execute = queryFactory
+			.delete(member)
+			.where(member.age.gt(18))
+			.execute();
+	}
 }
 
