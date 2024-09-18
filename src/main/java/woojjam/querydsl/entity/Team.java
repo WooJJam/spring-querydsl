@@ -1,4 +1,4 @@
-package woojjam.querydsl;
+package woojjam.querydsl.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
-import woojjam.querydsl.Member;
-import woojjam.querydsl.Team;
 
 @SpringBootTest
 @Transactional

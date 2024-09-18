@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityManager;
+import woojjam.querydsl.entity.Hello;
+import woojjam.querydsl.entity.QHello;
 
 @SpringBootTest
 @Transactional

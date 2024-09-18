@@ -1,8 +1,8 @@
 package woojjam.querydsl;
 
 import static org.assertj.core.api.Assertions.*;
-import static woojjam.querydsl.QMember.*;
-import static woojjam.querydsl.QTeam.*;
+import static woojjam.querydsl.entity.QMember.*;
+import static woojjam.querydsl.entity.QTeam.*;
 
 import java.util.List;
 
@@ -31,6 +31,9 @@ import jakarta.transaction.Transactional;
 import woojjam.querydsl.dto.MemberDto;
 import woojjam.querydsl.dto.QMemberDto;
 import woojjam.querydsl.dto.UserDto;
+import woojjam.querydsl.entity.Member;
+import woojjam.querydsl.entity.QMember;
+import woojjam.querydsl.entity.Team;
 
 @SpringBootTest
 @Transactional
